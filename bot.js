@@ -496,8 +496,20 @@
       });
     }
 
-    bot.launch({ dropPendingUpdates: true });
-    console.log("✅ mojevpnRobot started!");
+      async function launchBot(retries = 0) {
+        try {
+          await bot.launch({ dropPendingUpdates: true });
+          console.log("✅ mojevpnRobot started!");
+        } catch (err) {
+          if (err?.response?.error_code === 409 && retries < 12) {
+            console.log("⚠️ 409 conflict, retry " + (retries+1) + "/12 in 10s...");
+            await new Promise(r => setTimeout(r, 10000));
+            return launchBot(retries + 1);
+          }
+          throw err;
+        }
+      }
+      await launchBot();
     process.once("SIGINT", () => bot.stop("SIGINT"));
     process.once("SIGTERM", () => bot.stop("SIGTERM"));
   }
