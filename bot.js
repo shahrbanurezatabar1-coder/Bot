@@ -33,7 +33,7 @@ server.listen(PORT, () => console.log("HTTP server on port " + PORT));
 // ── DB ───────────────────────────────────────────────────────────────────────
 const pool = new Pool({
   connectionString: DB_URL,
-  ssl: DB_URL.includes("sslmode=disable") ? false : { rejectUnauthorized: false },
+  ssl: (DB_URL.includes("sslmode=disable") || DB_URL.includes(".railway.internal")) ? false : { rejectUnauthorized: false },
 });
 
 async function q(sql, p = []) {
